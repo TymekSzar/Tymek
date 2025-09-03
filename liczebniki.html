@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <title>Liczebniki 11-20 po angielsku</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; background-color: yellow; }
+    .card { border: 2px solid #4CAF50; border-radius: 12px; padding: 20px; width: 250px; margin: auto; background: white; }
+    button { margin-top: 10px; padding: 10px 20px; border: none; border-radius: 8px; background: #4CAF50; color: white; cursor: pointer; }
+    button:hover { background: #45a049; }
+    .quiz-btn { background: #2196F3; margin: 5px; }
+    .quiz-btn:hover { background: #0b7dda; }
+    .sound-btn { background: #FF9800; margin-left: 10px; }
+    .sound-btn:hover { background: #e68900; }
+  </style>
+</head>
+<body>
+  <h1>Nauka liczebników 11–20 po angielsku</h1>
+
+  <div class="card">
+    <h2 id="number">11</h2>
+    <h3 id="word">eleven</h3>
+    <button onclick="speakWord()">🔊 Odsłuchaj</button>
+    <br>
+    <button onclick="nextNumber()">➡️ Następny</button>
+  </div>
+
+  <h2>Mini quiz</h2>
+  <p id="quiz-question">Które słowo oznacza liczbę 15?</p>
+  <button id="quiz-sound" class="sound-btn" onclick="speakQuizNumber()" style="display:none;">🔊 Odsłuchaj</button>
+  <div id="quiz-options"></div>
+  <p id="quiz-feedback"></p>
+
+  <script>
+    const numbers = [
+      {num: 11, word: "eleven"},
+      {num: 12, word: "twelve"},
+      {num: 13, word: "thirteen"},
+      {num: 14, word: "fourteen"},
+      {num: 15, word: "fifteen"},
+      {num: 16, word: "sixteen"},
+      {num: 17, word: "seventeen"},
+      {num: 18, word: "eighteen"},
+      {num: 19, word: "nineteen"},
+      {num: 20, word: "twenty"}
+    ];
+
+    let currentIndex = 0;
+    let currentQuiz = null;
+
+    function updateCard() {
+      document.getElementById("number").innerText = numbers[currentIndex].num;
+      document.getElementById("word").innerText = numbers[currentIndex].word;
+    }
+
+    function nextNumber() {
+      currentIndex = (currentIndex + 1) % numbers.length;
+      updateCard();
+    }
+
+    function speakWord() {
+      const utterance = new SpeechSynthesisUtterance(numbers[currentIndex].word);
+      utterance.lang = "en-US";
+      speechSynthesis.speak(utterance);
+    }
+
+    // Quiz
+    function startQuiz() {
+      currentQuiz = numbers[Math.floor(Math.random() * numbers.length)];
+      document.getElementById("quiz-question").innerText = `Które słowo oznacza liczbę ${currentQuiz.num}?`;
+      document.getElementById("quiz-sound").style.display = "inline-block";
+
+      let options = [currentQuiz.word];
+      while (options.length < 3) {
+        const opt = numbers[Math.floor(Math.random() * numbers.length)].word;
+        if (!options.includes(opt)) options.push(opt);
+      }
+      options.sort(() => Math.random() - 0.5);
+
+      const container = document.getElementById("quiz-options");
+      container.innerHTML = "";
+      options.forEach(opt => {
+        const btn = document.createElement("button");
+        btn.innerText = opt;
+        btn.className = "quiz-btn";
+        btn.onclick = () => checkAnswer(opt, currentQuiz.word);
+        container.appendChild(btn);
+      });
+    }
+
+    function checkAnswer(chosen, correct) {
+      const feedback = document.getElementById("quiz-feedback");
+      if (chosen === correct) {
+        feedback.innerText = "✅ Brawo! Dobra odpowiedź.";
+      } else {
+        feedback.innerText = `❌ To nie to. Poprawnie: ${correct}`;
+      }
+      setTimeout(startQuiz, 2000);
+    }
+
+    function speakQuizNumber() {
+      if (currentQuiz) {
+        const utterance = new SpeechSynthesisUtterance(currentQuiz.word);
+        utterance.lang = "en-US";
+        speechSynthesis.speak(utterance);
+      }
+    }
+
+    // Start
+    updateCard();
+    startQuiz();
+  </script>
+</body>
+</html>
